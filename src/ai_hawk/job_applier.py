@@ -11,6 +11,7 @@ import traceback
 from typing import List, Optional, Any, Text, Tuple
 
 from httpx import HTTPStatusError
+from loguru import logger
 from regex import W
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
@@ -25,7 +26,7 @@ from job_application_saver import ApplicationSaver
 from job_portals.application_form_elements import SelectQuestion, TextBoxQuestionType
 from job_portals.base_job_portal import BaseJobPage, BaseJobPortal
 
-from src.logging import logger
+
 from src.job import Job
 from src.ai_hawk.llm.llm_manager import GPTAnswerer
 

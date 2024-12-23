@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from src.logging import logger
+from logger import logger
 
 @dataclass
 class Job:

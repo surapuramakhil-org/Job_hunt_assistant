@@ -6,16 +6,16 @@
 
   <!-- [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/AIhawkCommunity) -->
 
-# AIHawk the first Jobs Applier AI Agent
+# Auto_Jobs_Applier_AIHawk
 
   ![CI](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/actions/workflows/ci.yml/badge.svg)
 
 **🤖🔍 Your AI-powered job search assistant. Automate applications, get personalized recommendations, and land your dream job faster.**
 
-Join our community: [Telegram](https://t.me/AIhawkCommunity) (for Normal user) | [Discord](https://discord.gg/MYYwG8JyrQ) (for Open Source contributors)
+Join our community: [Telegram](https://t.me/AIhawkCommunity) (for Normal user) | [Discord](https://discord.gg/mMZcMTH9K6) (for Open Source contributors)
 
 [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/AIhawkCommunity)
-[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/MYYwG8JyrQ)
+[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/mMZcMTH9K6)
 
 </div>
 
@@ -26,7 +26,7 @@ As AIHawk is focusing on their proprietary product - solving problems in hiring 
 
 We are looking to expand our FOSS maintainers team! If you are from a non-technical background, you can be part of the project management team, triaging issues, and shaping the project. If you are a technical person, you can join in doing code reviews, participating in releases, and buidling better version of this product.
 
-reach out to [surapuramakhil](https://github.com/surapuramakhil) on [Discord](https://discord.gg/MYYwG8JyrQ). [Special thanks](#special-thanks) 
+reach out to [surapuramakhil](https://github.com/surapuramakhil) on [Discord](https://discord.gg/mMZcMTH9K6). [Special thanks](#special-thanks) 
 
 Auto_Jobs_Applier_AIHawk is continuously evolving, and your feedback, suggestions, and contributions are highly valued. Feel free to open issues, suggest enhancements, or submit pull requests to help improve the project. Let's work together to make Auto_Jobs_Applier_AIHawk a powerful tool for job seekers worldwide.
 
@@ -96,81 +96,59 @@ Auto_Jobs_Applier_AIHawk steps in as a game-changing solution to these challenge
 - Operating Systems:
   - Windows 10
   - Ubuntu 22
+  - macOS
 - Python versions:
   - 3.10
   - 3.11.9(64b)
   - 3.12.5(64b)
+  - 3.13
 
-### Option 1: Using Python Virtual Environment 
+## Prerequisites
 
-1. **Download and Install Python:**
+Before you begin, ensure you have met the following requirements:
 
-   Ensure you have the last Python version  installed. If not, download and install it from Python's official website. For detailed instructions, refer to the tutorials:
+### Download and Install Python
 
-   - [How to Install Python on Windows](https://www.geeksforgeeks.org/how-to-install-python-on-windows/)
-   - [How to Install Python on Linux](https://www.geeksforgeeks.org/how-to-install-python-on-linux/)
-   - [How to Download and Install Python on macOS](https://www.geeksforgeeks.org/how-to-download-and-install-python-latest-version-on-macos-mac-os-x/)
+Ensure you have the latest Python version installed (Python 3.8 or higher is required for Poetry). If not, download and install it from Python's official website. For detailed instructions, refer to the tutorials:
+- [How to Install Python on Windows](https://docs.python.org/3/using/windows.html)
+- [How to Install Python on Linux](https://docs.python.org/3/using/unix.html)
+- [How to Download and Install Python on macOS](https://docs.python.org/3/using/mac.html)
 
-2. **Download and Install Google Chrome:**
-   - Download and install the latest version of Google Chrome in its default location from the [official website](https://www.google.com/chrome).
+### Download and Install Google Chrome
 
-3. **Clone the repository:**
+Download and install the latest version of Google Chrome in its default location from the [official website](https://www.google.com/chrome/).
 
-   ```bash
-   git clone https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk.git
-   
-   cd Auto_Jobs_Applier_AIHawk
-   ```
+### Install Poetry
 
-4. **Activate virtual environment:**
+Follow the instructions provided on Poetry's [official installation page](https://python-poetry.org/docs/#installation).
 
-   ```bash
-   python3 -m venv virtual
-   ```
+### Clone the Repository
 
-   ```bash
-   source virtual/bin/activate
-   ```
+```bash
+git clone https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk.git
+cd Auto_Jobs_Applier_AIHawk
+```
 
-   or for Windows-based machines -
+### Setting Up the Project with Poetry
 
-   ```bash
-   .\virtual\Scripts\activate
-   ```
+Since the project already includes a `pyproject.toml` file, follow these steps:
 
-5. **Install the required packages:**
+#### Install Dependencies
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+Run the following command in the project directory to install all dependencies specified in `pyproject.toml`:
 
-### Option 2: Using Conda 
+```bash
+poetry install
+```
 
-1. **Install Conda:**
-   - Download and install Miniconda from the [official website](https://docs.conda.io/en/latest/miniconda.html)
-   - Or install Anaconda from the [Anaconda website](https://www.anaconda.com/download)
+#### Run the Program
 
-2. **Create and activate conda environment:**
-   ```bash
-   # Create new environment
-   conda create -n aihawk python=3.11
+After installing dependencies, run the program using:
 
-   # Activate environment
-   conda activate aihawk
-   ```
+```bash
+poetry run python src/main.py
+```
 
-3. **Clone the repository:**
-   ```bash
-   git clone https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk.git
-   cd Auto_Jobs_Applier_AIHawk
-   ```
-
-4. **Install dependencies:**
-   ```bash
-   # Install from requirements.txt
-   pip install -r requirements.txt
-   ```
- 
 
 ## Configuration
 
@@ -223,6 +201,17 @@ This file defines your job search parameters and bot behavior. Each section cont
     positions:
       - Software Developer
       - Data Scientist
+    ```
+
+- `keywords_whitelist:`
+  - List keywords to look for in the job description, for example, "chromium browser". This field is optional.
+  - Only use this field to find jobs that require specific technologies, products, or skills that is not mentioned in the job title.
+  - Warning: Any jobs without matching keywords in the job description will be skipped.
+  - Example:
+
+    ```yaml
+    keywords_whitelist:
+      - chromium browser
     ```
 
 - `locations:`
@@ -722,7 +711,7 @@ For further assistance, please create an issue on the [GitHub repository](https:
 
 ### For Developers
 
-- [Contribution Guidelines](CONTRIBUTING.md)
+- [Contribution Guidelines](docs/CONTRIBUTING.md)
 
 - [Lang Chain Developer Documentation](https://python.langchain.com/v0.2/docs/integrations/components/)
 

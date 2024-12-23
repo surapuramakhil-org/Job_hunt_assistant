@@ -1,0 +1,14 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/src",
+        "${workspaceFolder}"
+    ],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.indexing": true,
+    "python.linting.pylintArgs": [
+        "--init-hook",
+        "import sys; sys.path.append('${workspaceFolder}/src')",
+        "--disable=C0114,C0115,C0116"
+    ]
+}
