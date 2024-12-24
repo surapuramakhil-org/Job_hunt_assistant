@@ -72,3 +72,18 @@ Anybody can Review PRs - add review comments & Approve PR's
 As your contributions grow up, current active maintainers will move you to star contributors (gaining write access) then after demonstrating leadership qualities makes you qualify for maintainer.
 
 Wishing you the best of luck.
+
+## Expressing Interest
+
+If you're interested in contributing to the project, you can join specific groups based on your skills and interests. Joining these groups on Discord ensures you get notified when the respective team is mentioned.
+
+- **Reviewers Group**: For those interested in reviewing and approving PRs.
+- **Project Managers Group**: For those interested in triaging issues, defining feature/bug specifications, prioritizing bugs, and managing documentation like README and CONTRIBUTING files.
+
+To express your interest, join the relevant group on Discord by following these steps:
+1. Navigate to the Discord thread: https://discord.com/channels/1300208460788400159/1320801096448348241.
+2. Post a message in the thread expressing your interest in a specific role (e.g., Reviewer, Project Manager).
+3. Stay active and engaged within the community.
+
+We are an open community, and everyone is welcome to participate and contribute. Your involvement helps strengthen the project!
+
