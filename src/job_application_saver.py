@@ -1,4 +1,4 @@
-from src.logging import logger
+from logger import logger
 import os
 import json
 import shutil
