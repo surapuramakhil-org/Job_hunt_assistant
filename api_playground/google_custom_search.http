@@ -1,0 +1,18 @@
+### Google Custom Search API - Example Request
+GET https://www.googleapis.com/customsearch/v1
+Content-Type: application/json
+
+# Query Parameters
+key={{$dotenv GOOGLE_API_KEY}}
+cx={{$dotenv GOOGLE_SEARCH_ENGINE_ID}}
+q=new+jobs
+start=1
+
+
+
+### Debugging Request URL
+GET https://www.googleapis.com/customsearch/v1?key={{$dotenv GOOGLE_API_KEY}}&cx={{$dotenv GOOGLE_SEARCH_ENGINE_ID}}&q=new+jobs&start=1
+
+
+### lever jobs search Request URL
+GET https://www.googleapis.com/customsearch/v1?key={{$dotenv GOOGLE_API_KEY}}&cx={{$dotenv GOOGLE_SEARCH_ENGINE_ID}}&q=software+engineer+site:jobs.lever.co&start=1

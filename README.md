@@ -4,7 +4,7 @@
 
 # AIHawk the first Jobs Applier AI Agent
 
-  ![CI](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/actions/workflows/ci.yml/badge.svg)
+  ![CI](https://github.com/surapuramakhil-org/Job_hunt_assistant/actions/workflows/ci.yml/badge.svg)
 
 **🤖🔍 Your AI-powered job search assistant. Automate applications, get personalized recommendations, and land your dream job faster.**
 
@@ -119,8 +119,8 @@ Follow the instructions provided on Poetry's [official installation page](https:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk.git
-cd Auto_Jobs_Applier_AIHawk
+git clone https://github.com/surapuramakhil-org/Job_hunt_assistant.git
+cd Job_hunt_assistant
 ```
 
 ### Setting Up the Project with Poetry
@@ -134,6 +134,16 @@ Run the following command in the project directory to install all dependencies s
 ```bash
 poetry install
 ```
+
+### Create `.env` File
+
+To configure environment variables for the project, create a `.env` file by copying the `.env.template` file provided in the repository. This file will store sensitive information such as API keys and other configuration settings.
+
+```bash
+cp .env.template .env
+```
+
+After copying, open the `.env` file and fill in the required values. Ensure you do not share this file or commit it to version control, as it contains sensitive information.
 
 #### Run the Program
 
@@ -676,7 +686,7 @@ yaml.scanner.ScannerError: while scanning a simple key
 - Check internet connection stability
 - Clear browser cache and cookies if issues persist
 
-For further assistance, please create an issue on the [GitHub repository](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/issues) with detailed information about your problem, including error messages and your configuration (with sensitive information removed).
+For further assistance, please create an issue on the [GitHub repository](https://github.com/surapuramakhil-org/Job_hunt_assistant/issues) with detailed information about your problem, including error messages and your configuration (with sensitive information removed).
 
 ## Documentation
 
@@ -711,7 +721,7 @@ For further assistance, please create an issue on the [GitHub repository](https:
 
 - [Workflow diagrams](docs/workflow_diagrams.md)
 
-- If you encounter any issues, you can open an issue on [GitHub](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/issues).
+- If you encounter any issues, you can open an issue on [GitHub](https://github.com/surapuramakhil-org/Job_hunt_assistant/issues).
   Please add valuable details to the subject and to the description. If you need new feature then please reflect this.  
   I'll be more than happy to assist you!
 

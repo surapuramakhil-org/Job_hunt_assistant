@@ -17,7 +17,16 @@ from lib_resume_builder_AIHawk import (
     StyleManager,
 )
 from typing import Optional
-from constants import LINKEDIN, PLAIN_TEXT_RESUME_YAML, SECRETS_YAML, WORK_PREFERENCES_YAML
+from constants import (
+    COLLECT_MODE,
+    LINKEDIN,
+    OUTPUT_FIELE_DIRECTORY,
+    PLAIN_TEXT_RESUME_YAML,
+    SECRETS_YAML,
+    UPLOADS,
+    WORK_PREFERENCES_YAML,
+    WORK_PREFERENCES,
+)
 from src.job_portals.base_job_portal import get_job_portal
 from src.utils.chrome_utils import chrome_browser_options
 import undetected_chromedriver as uc
@@ -56,8 +65,8 @@ class ConfigValidator:
             raise ConfigError(f"File not found: {yaml_path}")
 
     @staticmethod
-    def validate_config(config_yaml_path: Path) -> dict:
-        parameters = ConfigValidator.validate_yaml_file(config_yaml_path)
+    def validate_work_preferences(work_preferences_file: Path) -> dict:
+        parameters = ConfigValidator.validate_yaml_file(work_preferences_file)
         required_keys = {
             "remote": bool,
             "experience_level": dict,
@@ -81,7 +90,7 @@ class ConfigValidator:
                     parameters[key] = []
                 else:
                     raise ConfigError(
-                        f"Missing or invalid key '{key}' in config file {config_yaml_path}"
+                        f"Missing or invalid key '{key}' in config file {work_preferences_file}"
                     )
             elif not isinstance(parameters[key], expected_type):
                 if (
@@ -92,7 +101,7 @@ class ConfigValidator:
                     parameters[key] = []
                 else:
                     raise ConfigError(
-                        f"Invalid type for key '{key}' in config file {config_yaml_path}. Expected {expected_type}."
+                        f"Invalid type for key '{key}' in config file {work_preferences_file}. Expected {expected_type}."
                     )
 
         # Validate experience levels, ensure they are boolean
@@ -107,7 +116,7 @@ class ConfigValidator:
         for level in experience_levels:
             if not isinstance(parameters["experience_level"].get(level), bool):
                 raise ConfigError(
-                    f"Experience level '{level}' must be a boolean in config file {config_yaml_path}"
+                    f"Experience level '{level}' must be a boolean in config file {work_preferences_file}"
                 )
 
         # Validate job types, ensure they are boolean
@@ -123,7 +132,7 @@ class ConfigValidator:
         for job_type in job_types:
             if not isinstance(parameters["job_types"].get(job_type), bool):
                 raise ConfigError(
-                    f"Job type '{job_type}' must be a boolean in config file {config_yaml_path}"
+                    f"Job type '{job_type}' must be a boolean in config file {work_preferences_file}"
                 )
 
         # Validate date filters
@@ -131,31 +140,31 @@ class ConfigValidator:
         for date_filter in date_filters:
             if not isinstance(parameters["date"].get(date_filter), bool):
                 raise ConfigError(
-                    f"Date filter '{date_filter}' must be a boolean in config file {config_yaml_path}"
+                    f"Date filter '{date_filter}' must be a boolean in config file {work_preferences_file}"
                 )
 
         # Validate positions and locations as lists of strings
         if not all(isinstance(pos, str) for pos in parameters["positions"]):
             raise ConfigError(
-                f"'positions' must be a list of strings in config file {config_yaml_path}"
+                f"'positions' must be a list of strings in config file {work_preferences_file}"
             )
         if not all(isinstance(loc, str) for loc in parameters["locations"]):
             raise ConfigError(
-                f"'locations' must be a list of strings in config file {config_yaml_path}"
+                f"'locations' must be a list of strings in config file {work_preferences_file}"
             )
 
         # Validate distance
         approved_distances = {0, 5, 10, 25, 50, 100}
         if parameters["distance"] not in approved_distances:
             raise ConfigError(
-                f"Invalid distance value in config file {config_yaml_path}. Must be one of: {approved_distances}"
+                f"Invalid distance value in config file {work_preferences_file}. Must be one of: {approved_distances}"
             )
 
         # Ensure blacklists are lists
         for blacklist in ["company_blacklist", "title_blacklist", "location_blacklist"]:
             if not isinstance(parameters.get(blacklist), list):
                 raise ConfigError(
-                    f"'{blacklist}' must be a list in config file {config_yaml_path}"
+                    f"'{blacklist}' must be a list in config file {work_preferences_file}"
                 )
             if parameters[blacklist] is None:
                 parameters[blacklist] = []
@@ -270,7 +279,7 @@ def create_and_run_bot(parameters, llm_api_key):
 
         browser = init_uc_browser()
         job_portal = get_job_portal(
-            driver=browser, portal_name=LINKEDIN, parameters=parameters
+            driver=browser, portal_name=LINKEDIN, work_preferences=parameters[WORK_PREFERENCES]
         )
         login_component = job_portal.authenticator
         apply_component = AIHawkJobManager(job_portal)
@@ -310,18 +319,18 @@ def create_and_run_bot(parameters, llm_api_key):
 def main(collect: bool = False, resume: Optional[Path] = None):
     try:
         data_folder = Path("data_folder")
-        secrets_file, config_file, plain_text_resume_file, output_folder = (
+        secrets_file, work_preferences_file, plain_text_resume_file, output_folder = (
             FileManager.validate_data_folder(data_folder)
         )
-
-        parameters = ConfigValidator.validate_config(config_file)
+        parameters = {}
+        parameters[WORK_PREFERENCES] = ConfigValidator.validate_work_preferences(work_preferences_file)
         llm_api_key = ConfigValidator.validate_secrets(secrets_file)
 
-        parameters["uploads"] = FileManager.file_paths_to_dict(
+        parameters[UPLOADS] = FileManager.file_paths_to_dict(
             resume, plain_text_resume_file
         )
-        parameters["outputFileDirectory"] = output_folder
-        parameters["collectMode"] = collect
+        parameters[OUTPUT_FIELE_DIRECTORY] = output_folder
+        parameters[COLLECT_MODE] = collect
 
         create_and_run_bot(parameters, llm_api_key)
     except ConfigError as ce:
