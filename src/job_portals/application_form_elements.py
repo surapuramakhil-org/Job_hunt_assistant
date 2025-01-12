@@ -16,9 +16,11 @@ class SelectQuestion:
     question: str
     options: list[str]
     type: SelectQuestionType
+    required: bool
 
 
 @dataclass
 class TextBoxQuestion:
     question: str
     type: TextBoxQuestionType
+    required: bool

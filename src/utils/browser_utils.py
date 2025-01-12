@@ -1,8 +1,40 @@
 
+from gc import callbacks
 import random
 import time
+from typing import Optional
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
+from selenium import webdriver
 
 from logger import logger
+import pygame
+import constants
+
+# Module-level variable to store the default driver
+__DEFAULT_DRIVER: Optional[webdriver.Chrome] = None
+
+def set_default_driver(driver: webdriver.Chrome):
+    """
+    Store the main.py's driver in a module-level variable so other
+    functions can use it when no driver is explicitly provided.
+    """
+    global __DEFAULT_DRIVER
+    __DEFAULT_DRIVER = driver
+    logger.debug("Default driver has been set for browser_utils.")
+
+def _get_driver(driver: Optional[webdriver.Chrome]) -> webdriver.Chrome:
+    """
+    Internal helper to either return the provided driver or fall back
+    to the stored default driver if none is provided.
+    """
+    if driver is not None:
+        return driver
+    if __DEFAULT_DRIVER is not None:
+        return __DEFAULT_DRIVER
+    raise RuntimeError(
+        "No driver provided and no default driver is set in browser_utils."
+    )
 
 
 def is_scrollable(element):
@@ -84,3 +116,55 @@ def scroll_slow(driver, scrollable_element, start=0, end=3600, step=300, reverse
 def remove_focus_active_element(driver):
     driver.execute_script("document.activeElement.blur();")
     logger.debug("Removed focus from active element.")
+
+def handle_security_checks(driver = None):
+    """
+    Handles security checks like CAPTCHAs by notifying the user and waiting for completion.
+    Assumes the page is already loaded.
+
+    Args:
+        driver (WebDriver): Selenium WebDriver instance.
+    """
+
+    if driver is None:
+        driver = _get_driver(driver)
+        if driver is None:
+            raise ValueError("No driver provided and no default driver set.")
+
+    try:
+        logger.debug("Checking for CAPTCHA...")
+        # Check if hcaptcha is present
+        captcha_element = driver.find_element(By.XPATH, "//iframe[contains(@src, 'hcaptcha')]")
+
+        if captcha_element.is_displayed():
+            logger.info("CAPTCHA detected. Bringing browser to the foreground.")
+
+            # Bring the browser window to the foreground
+            driver.switch_to.window(driver.current_window_handle)
+
+            # Play a notification sound to alert the user
+            logger.info("Playing notification sound...")
+            pygame.mixer.init()
+            pygame.mixer.music.load(constants.SECURITY_CHECK_ALERT_AUDIO)
+            pygame.mixer.music.play()
+
+            logger.info("Waiting for user to solve CAPTCHA...")
+            
+            # Wait for user to solve CAPTCHA (polling)
+            while True:
+                try:
+                    # Check if CAPTCHA iframe is gone
+                    if not captcha_element.is_displayed():
+                        logger.info("CAPTCHA solved.")
+                        break
+                    logger.info("CAPTCHA still present. Waiting...")
+                    time.sleep(5)  # Poll every 5 seconds
+                
+                except NoSuchElementException:
+                    logger.info("CAPTCHA solved.")
+                    break
+
+    except NoSuchElementException:
+        logger.debug("No CAPTCHA detected on the page.")
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")

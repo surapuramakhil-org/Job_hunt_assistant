@@ -19,7 +19,6 @@ from custom_exception import JobNotSuitableException
 from job import Job
 from logger import logger
 
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
@@ -345,11 +344,11 @@ class AIHawkJobManager:
                     logger.debug(f"Applied to job: {job.title} at {job.company}")
             except JobNotSuitableException as e:
                 logger.debug(f"Job not suitable for application: {job.title} at {job.company}")
-                self.write_to_file(job, "skipped", str(e))
+                self.write_to_file(job, "skipped", f"{str(e)} {traceback.format_exc()}")
                 continue
             except Exception as e:
                 logger.error(f"Failed to apply for {job.title} at {job.company}: {e}",exc_info=True)
-                self.write_to_file(job, "failed", f"Application error: {str(e)}")
+                self.write_to_file(job, "failed", f"Application error: {str(e)} {traceback.format_exc()}")
                 continue
 
     def write_to_file(self, job : Job, file_name, reason=None):

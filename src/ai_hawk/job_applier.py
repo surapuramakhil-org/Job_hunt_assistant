@@ -30,6 +30,7 @@ from job_portals.base_job_portal import BaseJobPage, BaseJobPortal
 
 from src.job import Job
 from src.ai_hawk.llm.llm_manager import GPTAnswerer
+from utils import browser_utils, time_utils
 
 
 def question_already_exists_in_data(question: str, data: List[dict]) -> bool:
@@ -117,6 +118,7 @@ class AIHawkJobApplier:
         job_context.job = job
         job_context.job_application = JobApplication(job)
         self.job_page.goto_job_page(job)
+        time_utils.short_sleep()
 
         try:
 
@@ -145,6 +147,7 @@ class AIHawkJobApplier:
                 raise JobNotSuitableException(f"Job is not suitable, got score {score}, reasoning: {reasoning}")
 
             self.job_page.click_apply_button(job_context)
+            time_utils.short_sleep()
 
             logger.debug("Filling out application form")
             self._fill_application_form(job_context)
@@ -199,14 +202,17 @@ class AIHawkJobApplier:
 
         while True:
             self.fill_up(job_context)
+            browser_utils.handle_security_checks()
 
             if self.job_application_page.has_next_button():
                 self.job_application_page.click_next_button()
                 self.job_application_page.handle_errors()
+                time_utils.short_sleep()
 
             elif self.job_application_page.has_submit_button():
                 self.job_application_page.click_submit_button()
                 ApplicationSaver.save(job_application)
+                browser_utils.handle_security_checks()
                 logger.debug("Application form submitted")
                 return
             
@@ -494,6 +500,8 @@ class AIHawkJobApplier:
     ) -> None:
         logger.debug("Processing form section")
 
+        browser_utils.handle_security_checks()
+
         if self.job_application_page.is_upload_field(form_element):
             self._handle_upload_fields(form_element, job_context)
             return
@@ -563,11 +571,11 @@ class AIHawkJobApplier:
         return
 
     def _handle_textbox_question(
-        self, job_context: JobContext, section: WebElement
+        self, job_context: JobContext, element: WebElement
     ) -> None:
 
         textbox_question = self.job_application_page.web_element_to_textbox_question(
-            section
+            element
         )
 
         question_text = textbox_question.question
@@ -609,7 +617,7 @@ class AIHawkJobApplier:
             self.all_data = self._load_questions_from_json()
             logger.debug("Saved non-cover letter answer to JSON.")
 
-        self.job_application_page.fill_textbox_question(section, answer)
+        self.job_application_page.fill_textbox_question(element, answer)
         logger.debug("Entered answer into the textbox.")
 
         job_context.job_application.save_application_data(

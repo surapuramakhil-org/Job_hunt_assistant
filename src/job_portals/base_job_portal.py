@@ -132,19 +132,19 @@ class BaseApplicationPage(WebPage):
         pass
 
     @abstractmethod
-    def is_terms_of_service(self, section: WebElement) -> bool:
+    def is_terms_of_service(self, element: WebElement) -> bool:
         pass
 
     @abstractmethod
-    def accept_terms_of_service(self, section: WebElement) -> None:
+    def accept_terms_of_service(self, element: WebElement) -> None:
         pass
 
     @abstractmethod
-    def is_radio_question(self, section: WebElement) -> bool:
-        pass
+    def is_radio_question(self, element: WebElement) -> bool:
+        return False
 
     @abstractmethod
-    def web_element_to_radio_question(self, section: WebElement) -> SelectQuestion:
+    def web_element_to_radio_question(self, element: WebElement) -> SelectQuestion:
         pass
 
     @abstractmethod
@@ -154,27 +154,27 @@ class BaseApplicationPage(WebPage):
         pass
 
     @abstractmethod
-    def is_textbox_question(self, section: WebElement) -> bool:
+    def is_textbox_question(self, element: WebElement) -> bool:
         pass
 
     @abstractmethod
-    def web_element_to_textbox_question(self, section: WebElement) -> TextBoxQuestion:
+    def web_element_to_textbox_question(self, element: WebElement) -> TextBoxQuestion:
         pass
 
     @abstractmethod
-    def fill_textbox_question(self, section: WebElement, answer: str) -> None:
+    def fill_textbox_question(self, element: WebElement, answer: str) -> None:
         pass
 
     @abstractmethod
-    def is_dropdown_question(self, section: WebElement) -> bool:
+    def is_dropdown_question(self, element: WebElement) -> bool:
         pass
 
     @abstractmethod
-    def web_element_to_dropdown_question(self, section: WebElement) -> SelectQuestion:
+    def web_element_to_dropdown_question(self, element: WebElement) -> SelectQuestion:
         pass
 
     @abstractmethod
-    def select_dropdown_option(self, section: WebElement, answer: str) -> None:
+    def select_dropdown_option(self, element: WebElement, answer: str) -> None:
         pass
 
     @abstractmethod

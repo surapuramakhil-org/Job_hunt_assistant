@@ -15,7 +15,6 @@ class LeverJobPage(BaseJobPage):
     def goto_job_page(self, job):
         try:
             self.driver.get(job.link)
-            time_utils.short_sleep()
             logger.debug(f"Navigated to job link: {job.link}")
         except Exception as e:
             logger.error(f"Failed to navigate to job link: {job.link}, error: {str(e)}")

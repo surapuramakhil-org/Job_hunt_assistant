@@ -47,6 +47,7 @@ langchain-ollama = "^0.2.1"
 #langchain-huggingface # commented due to its dependency with torch
 undetected-chromedriver = "^3.5.5"
 stringcase = "^1.2.0"
+pygame = "^2.6.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"

@@ -33,9 +33,8 @@ from src.utils.chrome_utils import chrome_browser_options
 
 from job_application_profile import JobApplicationProfile
 from logger import logger
+from utils import browser_utils
 
-# Suppress stderr only during specific operations
-original_stderr = sys.stderr
 
 from ai_hawk.bot_facade import AIHawkBotFacade
 from ai_hawk.job_manager import AIHawkJobManager
@@ -269,6 +268,7 @@ def create_and_run_bot(parameters, llm_api_key):
         job_application_profile_object = JobApplicationProfile(plain_text_resume)
 
         browser = init_browser()
+        browser_utils.set_default_driver(browser)
         job_portal = get_job_portal(
             driver=browser, portal_name=LEVER, work_preferences=parameters[WORK_PREFERENCES]
         )
