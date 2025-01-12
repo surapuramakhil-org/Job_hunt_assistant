@@ -8,9 +8,10 @@ import random
 import re
 import time
 import traceback
-from typing import List, Optional, Any, Text, Tuple
+from typing import List, Optional, Any, Tuple
 
 from httpx import HTTPStatusError
+from loguru import logger
 from regex import W
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
@@ -19,13 +20,14 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 
+from custom_exception import JobNotSuitableException
 from jobContext import JobContext
 from job_application import JobApplication
 from job_application_saver import ApplicationSaver
 from job_portals.application_form_elements import SelectQuestion, TextBoxQuestionType
 from job_portals.base_job_portal import BaseJobPage, BaseJobPortal
 
-from src.logging import logger
+
 from src.job import Job
 from src.ai_hawk.llm.llm_manager import GPTAnswerer
 
@@ -51,6 +53,7 @@ class AIHawkJobApplier:
         resume_dir: Optional[str],
         set_old_answers: List[Tuple[str, str, str]],
         gpt_answerer: GPTAnswerer,
+        work_preferences: dict,
         resume_generator_manager,
     ):
         logger.debug("Initializing AIHawkEasyApplier")
@@ -64,7 +67,8 @@ class AIHawkJobApplier:
         self.resume_generator_manager = resume_generator_manager
         self.all_data = self._load_questions_from_json()
         self.current_job : Job | None = None
-
+        self.work_preferences = work_preferences
+        self.keywords_whitelist = work_preferences.get("keywords_whitelist", [])
         logger.debug("AIHawkEasyApplier initialized successfully")
 
     def _load_questions_from_json(self) -> List[dict]:
@@ -129,9 +133,16 @@ class AIHawkJobApplier:
             logger.debug("Passing job information to GPT Answerer")
             self.gpt_answerer.set_job(job)
 
-            # Todo: add this job to skip list with it's reason
-            if not self.gpt_answerer.is_job_suitable():
-                return
+            keywords_whitelist_check, _  = self._check_keywords_whitelist(job)
+            
+            if not keywords_whitelist_check:
+                logger.debug(f"Job description keywords not found for {job.title} at {job.company}")
+                raise JobNotSuitableException(f"Keywords whitelist didn't pass, keywords:{self.keywords_whitelist} Job Description {job.description} ")
+
+            is_suitable, score, reasoning = self.gpt_answerer.is_job_suitable()
+
+            if not is_suitable:
+                raise JobNotSuitableException(f"Job is not suitable, got score {score}, reasoning: {reasoning}")
 
             self.job_page.click_apply_button(job_context)
 
@@ -148,91 +159,110 @@ class AIHawkJobApplier:
 
             logger.debug("Saving application process due to failure")
             self.job_application_page.save()
+            
+            raise e
+    
+    def _check_keywords_whitelist(self, job : Job) -> Tuple[bool, Optional[str]]:
+        """
+        Check if job description contains any of the specified keywords.
+        
+        Returns:
+            bool: True if any keyword is found in description, False otherwise
+        """
+        logger.debug(f"Checking job description for keywords: {self.keywords_whitelist}")
+        try:
+            
+            # Get the full description text
+            description_text = job.description.lower()
 
-            raise Exception(
-                f"Failed to apply to job! Original exception:\nTraceback:\n{tb_str}"
-            )
+            if self.keywords_whitelist == []:
+                logger.debug("No keywords specified for job description check")
+                return True, None
+            
+            # Check if any keyword exists in the description
+            for keyword in self.keywords_whitelist:
+                if keyword.lower() in description_text:
+                    logger.debug(f"Found keyword '{keyword}' in job description")
+                    return True, None
+                    
+            logger.debug("No matching keywords found in job description")
+            return False, "No matching keywords found in job description"
+            
+        except Exception as e:
+            logger.error(f"Error checking job description keywords: {e}")
+            return True, None
 
     def _fill_application_form(self, job_context: JobContext):
         job = job_context.job
         job_application = job_context.job_application
         logger.debug(f"Filling out application form for job: {job}")
 
-        self.fill_up(job_context)
-
-        while self.job_application_page.has_next_button():
+        while True:
             self.fill_up(job_context)
-            self.job_application_page.click_next_button()
-            self.job_application_page.handle_errors()
 
-        if self.job_application_page.has_submit_button():
-            self.job_application_page.click_submit_button()
-            ApplicationSaver.save(job_application)
-            logger.debug("Application form submitted")
-            return
+            if self.job_application_page.has_next_button():
+                self.job_application_page.click_next_button()
+                self.job_application_page.handle_errors()
 
-        logger.warning(f"submit button not found, discarding application {job}")
+            elif self.job_application_page.has_submit_button():
+                self.job_application_page.click_submit_button()
+                ApplicationSaver.save(job_application)
+                logger.debug("Application form submitted")
+                return
+            
+            else:
+                logger.warning(f"submit button not found, discarding application {job}")
+                return
 
     def fill_up(self, job_context: JobContext) -> None:
         job = job_context.job
         logger.debug(f"Filling up form sections for job: {job}")
 
-        input_elements = self.job_application_page.get_input_elements()
+        form_sections = self.job_application_page.get_form_sections()
 
         try:
-            for element in input_elements:
-                self._process_form_element(element, job_context)
+            for form_section in form_sections:
+                self._process_form_section(form_section=form_section, job_context=job_context)
 
         except Exception as e:
             logger.error(
                 f"Failed to fill up form sections: {e} {traceback.format_exc()}"
             )
 
-    def _process_form_element(
-        self, element: WebElement, job_context: JobContext
-    ) -> None:
-        logger.debug(f"Processing form element {element}")
-        if self.job_application_page.is_upload_field(element):
-            self._handle_upload_fields(element, job_context)
-        else:
-            self._fill_additional_questions(job_context)
-
     def _handle_upload_fields(
         self, element: WebElement, job_context: JobContext
     ) -> None:
-        logger.debug("Handling upload fields")
+        logger.debug("Handling upload field")
 
-        file_upload_elements = self.job_application_page.get_file_upload_elements()
+        file_upload_element_heading = self.job_application_page.get_upload_element_heading(element)
 
-        for element in file_upload_elements:
+        logger.debug(f"File upload element heading: {file_upload_element_heading}")
 
-            file_upload_element_heading = (
-                self.job_application_page.get_upload_element_heading(element)
-            )
+        output = self.gpt_answerer.determine_resume_or_cover(
+            file_upload_element_heading
+        )
 
-            output = self.gpt_answerer.determine_resume_or_cover(
-                file_upload_element_heading
-            )
+        logger.debug(f"Output from LLM: {output}")
 
-            if "resume" in output:
-                logger.debug("Uploading resume")
-                if self.resume_path is not None and os.path.isfile(self.resume_path):
-                    resume_file_path = os.path.abspath(self.resume_path)
-                    self.job_application_page.upload_file(element, resume_file_path)
-                    job_context.job.resume_path = resume_file_path
-                    job_context.job_application.resume_path = str(resume_file_path)
-                    logger.debug(f"Resume uploaded from path: {resume_file_path}")
-                else:
-                    logger.debug(
-                        "Resume path not found or invalid, generating new resume"
-                    )
-                    self._create_and_upload_resume(element, job_context)
+        if "resume" in output:
+            logger.debug("Uploading resume")
+            if self.resume_path is not None and os.path.isfile(self.resume_path):
+                resume_file_path = os.path.abspath(self.resume_path)
+                self.job_application_page.upload_file(element, resume_file_path)
+                job_context.job.resume_path = resume_file_path
+                job_context.job_application.resume_path = str(resume_file_path)
+                logger.debug(f"Resume uploaded from path: {resume_file_path}")
+            else:
+                logger.debug(
+                    "Resume path not found or invalid, generating new resume"
+                )
+                self._create_and_upload_resume(element, job_context)
 
-            elif "cover" in output:
-                logger.debug("Uploading cover letter")
-                self._create_and_upload_cover_letter(element, job_context)
+        elif "cover" in output:
+            logger.debug("Uploading cover letter")
+            self._create_and_upload_cover_letter(element, job_context)
 
-        logger.debug("Finished handling upload fields")
+        logger.debug("Finished handling upload field")
 
     def _create_and_upload_resume(self, element, job_context: JobContext):
         job = job_context.job
@@ -453,36 +483,41 @@ class AIHawkJobApplier:
             logger.error(f"Cover letter upload failed: {tb_str}")
             raise Exception(f"Upload failed: \nTraceback:\n{tb_str}")
 
-    def _fill_additional_questions(self, job_context: JobContext) -> None:
+    def _process_form_section(self, job_context: JobContext, form_section: WebElement) -> None:
         logger.debug("Filling additional questions")
-        form_sections = self.job_application_page.get_form_sections()
-        for section in form_sections:
-            self._process_form_section(job_context, section)
+        form_elements = self.job_application_page.get_input_elements(form_section=form_section)
+        for form_element in form_elements:
+            self._process_form_element(job_context, form_element)
 
-    def _process_form_section(
-        self, job_context: JobContext, section: WebElement
+    def _process_form_element(
+        self, job_context: JobContext, form_element: WebElement
     ) -> None:
         logger.debug("Processing form section")
-        if self.job_application_page.is_terms_of_service(section):
+
+        if self.job_application_page.is_upload_field(form_element):
+            self._handle_upload_fields(form_element, job_context)
+            return
+        
+        if self.job_application_page.is_terms_of_service(form_element):
             logger.debug("Handled terms of service")
-            self.job_application_page.accept_terms_of_service(section)
+            self.job_application_page.accept_terms_of_service(form_element)
             return
 
-        if self.job_application_page.is_radio_question(section):
+        if self.job_application_page.is_radio_question(form_element):
             radio_question = self.job_application_page.web_element_to_radio_question(
-                section
+                form_element
             )
-            self._handle_radio_question(job_context, radio_question, section)
+            self._handle_radio_question(job_context, radio_question, form_element)
             logger.debug("Handled radio button")
             return
 
-        if self.job_application_page.is_textbox_question(section):
-            self._handle_textbox_question(job_context, section)
+        if self.job_application_page.is_textbox_question(form_element):
+            self._handle_textbox_question(job_context, form_element)
             logger.debug("Handled textbox question")
             return
 
-        if self.job_application_page.is_dropdown_question(section):
-            self._handle_dropdown_question(job_context, section)
+        if self.job_application_page.is_dropdown_question(form_element):
+            self._handle_dropdown_question(job_context, form_element)
             logger.debug("Handled dropdown question")
             return
 

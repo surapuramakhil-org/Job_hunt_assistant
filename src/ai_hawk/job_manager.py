@@ -5,17 +5,25 @@ import time
 from itertools import product
 from pathlib import Path
 import traceback
+from datetime import datetime
 
 from inputimeout import inputimeout, TimeoutOccurred
 
 from ai_hawk.job_applier import AIHawkJobApplier
-from config import JOB_MAX_APPLICATIONS, JOB_MIN_APPLICATIONS, MINIMUM_WAIT_TIME_IN_SECONDS
+import config
 
+from constants import WORK_PREFERENCES
+from job_application_profile import WorkPreferences
 from job_portals.base_job_portal import BaseJobPortal, get_job_portal
-from src.job import Job
-from src.logging import logger
+from custom_exception import JobNotSuitableException
+from job import Job
+from logger import logger
 
-from src.regex_utils import look_ahead_patterns
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+
+from regex_utils import look_ahead_patterns
 import re
 
 import utils.browser_utils as browser_utils
@@ -52,16 +60,17 @@ class AIHawkJobManager:
 
     def set_parameters(self, parameters):
         logger.debug("Setting parameters for AIHawkJobManager")
-        self.company_blacklist = parameters.get('company_blacklist', []) or []
-        self.title_blacklist = parameters.get('title_blacklist', []) or []
-        self.location_blacklist = parameters.get('location_blacklist', []) or []
-        self.positions = parameters.get('positions', [])
-        self.locations = parameters.get('locations', [])
-        self.apply_once_at_company = parameters.get('apply_once_at_company', False)
+        self.workPreferences = parameters.get(WORK_PREFERENCES)
+        self.company_blacklist = self.workPreferences.get('company_blacklist', []) or []
+        self.title_blacklist = self.workPreferences.get('title_blacklist', []) or []
+        self.location_blacklist = self.workPreferences.get('location_blacklist', []) or []
+        self.positions = self.workPreferences.get('positions', [])
+        self.locations = self.workPreferences.get('locations', [])
         self.seen_jobs = []
+        self.keywords_whitelist = self.workPreferences.get('keywords_whitelist', []) or []
 
-        self.min_applicants = JOB_MIN_APPLICATIONS
-        self.max_applicants = JOB_MAX_APPLICATIONS
+        self.min_applicants = config.JOB_MIN_APPLICATIONS
+        self.max_applicants = config.JOB_MAX_APPLICATIONS
 
         # Generate regex patterns from blacklist lists
         self.title_blacklist_patterns = look_ahead_patterns(self.title_blacklist)
@@ -130,15 +139,14 @@ class AIHawkJobManager:
     def start_applying(self):
         logger.debug("Starting job application process")
         self.easy_applier_component = AIHawkJobApplier(self.job_portal, self.resume_path, self.set_old_answers,
-                                                          self.gpt_answerer, self.resume_generator_manager)
+                                                          self.gpt_answerer,self.workPreferences , self.resume_generator_manager)
         searches = list(product(self.positions, self.locations))
         random.shuffle(searches)
         page_sleep = 0
-        minimum_time = MINIMUM_WAIT_TIME_IN_SECONDS
+        minimum_time = config.MINIMUM_WAIT_TIME_IN_SECONDS
         minimum_page_time = time.time() + minimum_time
 
         for position, location in searches:
-            location_url = "&location=" + location
             job_page_number = -1
             logger.debug(f"Starting the search for {position} in {location}.")
 
@@ -147,7 +155,7 @@ class AIHawkJobManager:
                     page_sleep += 1
                     job_page_number += 1
                     logger.debug(f"Going to job page {job_page_number}")
-                    self.job_portal.jobs_page.next_job_page(position, location_url, job_page_number)
+                    self.job_portal.jobs_page.next_job_page(position, location, job_page_number)
                     utils.time_utils.medium_sleep()
                     logger.debug("Starting the application process for this page...")
 
@@ -326,11 +334,19 @@ class AIHawkJobManager:
             if self.is_already_applied_to_company(job.company):
                 self.write_to_file(job, "skipped", "Already applied to this company")
                 continue
+            
+            
+            self.job_portal.job_page.goto_job_page(job)
+                
             try:
-                if job.apply_method not in {"Continue", "Applied", "Apply"}:
+                if job.job_state not in {"Continue", "Applied", "Apply"}:
                     self.easy_applier_component.job_apply(job)
                     self.write_to_file(job, "success")
                     logger.debug(f"Applied to job: {job.title} at {job.company}")
+            except JobNotSuitableException as e:
+                logger.debug(f"Job not suitable for application: {job.title} at {job.company}")
+                self.write_to_file(job, "skipped", str(e))
+                continue
             except Exception as e:
                 logger.error(f"Failed to apply for {job.title} at {job.company}: {e}",exc_info=True)
                 self.write_to_file(job, "failed", f"Application error: {str(e)}")
@@ -388,7 +404,7 @@ class AIHawkJobManager:
         return link_seen
 
     def is_already_applied_to_company(self, company):
-        if not self.apply_once_at_company:
+        if not config.APPLY_ONCE_PER_COMPANY:
             return False
 
         output_files = ["success.json"]

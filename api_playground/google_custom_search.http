@@ -1,0 +1,15 @@
+### Sample Request URL
+GET https://www.googleapis.com/customsearch/v1
+    ?key={{$dotenv GOOGLE_API_KEY}}
+    &cx={{$dotenv GOOGLE_SEARCH_ENGINE_ID}}
+    &q=new+jobs
+    &start=1
+
+### lever jobs search Request URL
+GET https://www.googleapis.com/customsearch/v1
+    ?key={{$dotenv GOOGLE_API_KEY}}
+    &cx={{$dotenv GOOGLE_SEARCH_ENGINE_ID}}
+    &q=site:jobs.lever.co Software Engineer (Java OR Python OR Full Time OR Contract OR Part Time OR Temporary OR Entry OR Associate OR Mid Senior Level)
+    &gl=US
+    &dateRestrict=d7
+    &start=1

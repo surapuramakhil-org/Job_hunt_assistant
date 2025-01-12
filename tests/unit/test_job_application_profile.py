@@ -1,5 +1,5 @@
 import pytest
-from src.job_application_profile import JobApplicationProfile
+from job_application_profile import JobApplicationProfile
 
 @pytest.fixture
 def valid_yaml():

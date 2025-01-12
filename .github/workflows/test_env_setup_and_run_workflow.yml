@@ -1,0 +1,43 @@
+name: Test Environment Setup and Run Workflow
+
+on:
+  workflow_call:
+    inputs:
+      test_command:
+        description: "The command to run tests"
+        required: true
+        type: string
+
+jobs:
+  setup_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.13'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          export PATH="$HOME/.local/bin:$PATH"
+
+      - name: Set PYTHONPATH for src directory
+        run: |
+          echo "PYTHONPATH=$PWD/src" >> $GITHUB_ENV
+          echo "PYTHONPATH set to $PWD/src"
+
+      - name: Install dependencies (with dev)
+        run: poetry install --with dev
+
+      - name: Debug PYTHONPATH
+        run: echo $PYTHONPATH # Print PYTHONPATH to verify it's set correctly
+
+      - name: Run tests with PyTest configuration
+        env:
+          PYTHONPATH: ${{ env.PYTHONPATH }} # Explicitly pass PYTHONPATH to the test environment
+        run: ${{ inputs.test_command }}

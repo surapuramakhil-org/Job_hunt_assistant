@@ -4,14 +4,11 @@
 
 # AIHawk the first Jobs Applier AI Agent
 
-  ![CI](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/actions/workflows/ci.yml/badge.svg)
+  ![CI](https://github.com/surapuramakhil-org/Job_hunt_assistant/actions/workflows/ci.yml/badge.svg)
 
 **🤖🔍 Your AI-powered job search assistant. Automate applications, get personalized recommendations, and land your dream job faster.**
 
-Join our community: [Telegram] (for Normal user) | [Discord](https://discord.gg/MYYwG8JyrQ) (for Open Source contributors)
-
-[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)]()
-[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/MYYwG8JyrQ)
+[![Discord](https://img.shields.io/discord/1300208460788400159?style=for-the-badge&color=5865F2&logo=discord&logoColor=white&label=Discord)](https://discord.gg/MYYwG8JyrQ)
 
 </div>
 
@@ -20,9 +17,7 @@ As AIHawk is focusing on their proprietary product - solving problems in hiring 
 
 **Project Maintainers / Leads**: [surapuramakhil](https://github.com/surapuramakhil), [sarob](https://github.com/sarob), [cjbbb](https://github.com/cjbbb)
 
-We are looking to expand our FOSS maintainers team! If you are from a non-technical background, you can be part of the project management team, triaging issues, and shaping the project. If you are a technical person, you can join in doing code reviews, participating in releases, and buidling better version of this product.
-
-reach out to [surapuramakhil](https://github.com/surapuramakhil) on [Discord](https://discord.gg/MYYwG8JyrQ). [Special thanks](#special-thanks) 
+[Special thanks](#special-thanks) 
 
 Auto_Jobs_Applier_AIHawk is continuously evolving, and your feedback, suggestions, and contributions are highly valued. Feel free to open issues, suggest enhancements, or submit pull requests to help improve the project. Let's work together to make Auto_Jobs_Applier_AIHawk a powerful tool for job seekers worldwide.
 
@@ -92,81 +87,69 @@ Auto_Jobs_Applier_AIHawk steps in as a game-changing solution to these challenge
 - Operating Systems:
   - Windows 10
   - Ubuntu 22
+  - macOS
 - Python versions:
   - 3.10
   - 3.11.9(64b)
   - 3.12.5(64b)
+  - 3.13
 
-### Option 1: Using Python Virtual Environment 
+## Prerequisites
 
-1. **Download and Install Python:**
+Before you begin, ensure you have met the following requirements:
 
-   Ensure you have the last Python version  installed. If not, download and install it from Python's official website. For detailed instructions, refer to the tutorials:
+### Download and Install Python
 
-   - [How to Install Python on Windows](https://www.geeksforgeeks.org/how-to-install-python-on-windows/)
-   - [How to Install Python on Linux](https://www.geeksforgeeks.org/how-to-install-python-on-linux/)
-   - [How to Download and Install Python on macOS](https://www.geeksforgeeks.org/how-to-download-and-install-python-latest-version-on-macos-mac-os-x/)
+Ensure you have the latest Python version installed (Python 3.8 or higher is required for Poetry). If not, download and install it from Python's official website. For detailed instructions, refer to the tutorials:
+- [How to Install Python on Windows](https://docs.python.org/3/using/windows.html)
+- [How to Install Python on Linux](https://docs.python.org/3/using/unix.html)
+- [How to Download and Install Python on macOS](https://docs.python.org/3/using/mac.html)
 
-2. **Download and Install Google Chrome:**
-   - Download and install the latest version of Google Chrome in its default location from the [official website](https://www.google.com/chrome).
+### Download and Install Google Chrome
 
-3. **Clone the repository:**
+Download and install the latest version of Google Chrome in its default location from the [official website](https://www.google.com/chrome/).
 
-   ```bash
-   git clone https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk.git
-   
-   cd Auto_Jobs_Applier_AIHawk
-   ```
+### Install Poetry
 
-4. **Activate virtual environment:**
+Follow the instructions provided on Poetry's [official installation page](https://python-poetry.org/docs/#installation).
 
-   ```bash
-   python3 -m venv virtual
-   ```
+### Clone the Repository
 
-   ```bash
-   source virtual/bin/activate
-   ```
+```bash
+git clone https://github.com/surapuramakhil-org/Job_hunt_assistant.git
+cd Job_hunt_assistant
+```
 
-   or for Windows-based machines -
+### Setting Up the Project with Poetry
 
-   ```bash
-   .\virtual\Scripts\activate
-   ```
+Since the project already includes a `pyproject.toml` file, follow these steps:
 
-5. **Install the required packages:**
+#### Install Dependencies
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+Run the following command in the project directory to install all dependencies specified in `pyproject.toml`:
 
-### Option 2: Using Conda 
+```bash
+poetry install
+```
 
-1. **Install Conda:**
-   - Download and install Miniconda from the [official website](https://docs.conda.io/en/latest/miniconda.html)
-   - Or install Anaconda from the [Anaconda website](https://www.anaconda.com/download)
+### Create `.env` File
 
-2. **Create and activate conda environment:**
-   ```bash
-   # Create new environment
-   conda create -n aihawk python=3.11
+To configure environment variables for the project, create a `.env` file by copying the `.env.template` file provided in the repository. This file will store sensitive information such as API keys and other configuration settings.
 
-   # Activate environment
-   conda activate aihawk
-   ```
+```bash
+cp .env.template .env
+```
 
-3. **Clone the repository:**
-   ```bash
-   git clone https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk.git
-   cd Auto_Jobs_Applier_AIHawk
-   ```
+After copying, open the `.env` file and fill in the required values. Ensure you do not share this file or commit it to version control, as it contains sensitive information.
 
-4. **Install dependencies:**
-   ```bash
-   # Install from requirements.txt
-   pip install -r requirements.txt
-   ```
- 
+#### Run the Program
+
+After installing dependencies, run the program using:
+
+```bash
+poetry run python src/main.py
+```
+
 
 ## Configuration
 
@@ -219,6 +202,17 @@ This file defines your job search parameters and bot behavior. Each section cont
     positions:
       - Software Developer
       - Data Scientist
+    ```
+
+- `keywords_whitelist:`
+  - List keywords to look for in the job description, for example, "chromium browser". This field is optional.
+  - Only use this field to find jobs that require specific technologies, products, or skills that is not mentioned in the job title.
+  - Warning: Any jobs without matching keywords in the job description will be skipped.
+  - Example:
+
+    ```yaml
+    keywords_whitelist:
+      - chromium browser
     ```
 
 - `locations:`
@@ -689,25 +683,25 @@ yaml.scanner.ScannerError: while scanning a simple key
 - Check internet connection stability
 - Clear browser cache and cookies if issues persist
 
-For further assistance, please create an issue on the [GitHub repository](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/issues) with detailed information about your problem, including error messages and your configuration (with sensitive information removed).
+For further assistance, please create an issue on the [GitHub repository](https://github.com/surapuramakhil-org/Job_hunt_assistant/issues) with detailed information about your problem, including error messages and your configuration (with sensitive information removed).
 
 ## Documentation
 
 ### For Users
 
 - Ollama & Gemini Setup
-  - To install and configure **Ollama** and **Gemini**, [Download Ollama and Gemini Setup Guide (PDF)](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/blob/main/docs/guide_to_setup_ollama_and_gemini.pdf)
+  - To install and configure **Ollama** and **Gemini**, [Download Ollama and Gemini Setup Guide (PDF)](docs/guide_to_setup_ollama_and_gemini.pdf)
   - Follow the instructions in these guides to ensure proper configuration of **AIHawk** with **Ollama** and **Gemini**.
   - Written by Rushi, [Linkedin](https://www.linkedin.com/in/rushichaganti/), support him by following.
 
 - Editing YAML Files
   - For detailed instructions on editing YAML configuration sections for **AIHawk**, refer to this document:
-  - [Download YAML Editing Guide (PDF)](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/blob/main/docs/guide_yaml_sections.pdf)
+  - [Download YAML Editing Guide (PDF)](docs/guide_yaml_sections.pdf)
   - Written by Rushi, [Linkedin](https://www.linkedin.com/in/rushichaganti/), support him by following.
 
 - Auto-start AIHawk
   - To make **AIHawk** automatically start when your system boots, follow the steps in this guide:
-  - [Download Auto-start AIHawk Guide (PDF)](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/blob/main/docs/guide_to_autostart_aihawk.pdf)
+  - [Download Auto-start AIHawk Guide (PDF)](docs/guide_to_autostart_aihawk.pdf)
   - Written by Rushi, [Linkedin](https://www.linkedin.com/in/rushichaganti/), support him by following.
 
 - Video Tutorial
@@ -718,13 +712,13 @@ For further assistance, please create an issue on the [GitHub repository](https:
 
 ### For Developers
 
-- [Contribution Guidelines](CONTRIBUTING.md)
+- [Contribution Guidelines](docs/CONTRIBUTING.md)
 
 - [Lang Chain Developer Documentation](https://python.langchain.com/v0.2/docs/integrations/components/)
 
 - [Workflow diagrams](docs/workflow_diagrams.md)
 
-- If you encounter any issues, you can open an issue on [GitHub](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/issues).
+- If you encounter any issues, you can open an issue on [GitHub](https://github.com/surapuramakhil-org/Job_hunt_assistant/issues).
   Please add valuable details to the subject and to the description. If you need new feature then please reflect this.  
   I'll be more than happy to assist you!
 
@@ -736,15 +730,15 @@ Auto_Jobs_Applier_AIHawk provides a significant advantage in the modern job mark
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=feder-cr/Auto_Jobs_Applier_AIHawk&type=Date)](https://star-history.com/#feder-cr/Auto_Jobs_Applier_AIHawk&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=surapuramakhil-org/Job_hunt_assistant&type=Date)](https://star-history.com/#surapuramakhil-org/Job_hunt_assistant&Date)
 
 If you like the project please star ⭐ the repository!
 
 ## Special Thanks
-[![Contributors](https://img.shields.io/github/contributors/feder-cr/Auto_Jobs_Applier_AIHawk)](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/graphs/contributors)
+[![Contributors](https://img.shields.io/github/contributors/surapuramakhil-org/Job_hunt_assistant)](https://github.com/surapuramakhil-org/Job_hunt_assistant/graphs/contributors)
 
-<a href="https://github.com/AIHawk-co/Auto_Jobs_Applier/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=AIHawk-co/Auto_Jobs_Applier" />
+<a href="https://github.com/surapuramakhil-org/Job_hunt_assistant/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=surapuramakhil-org/Job_hunt_assistant" />
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks).

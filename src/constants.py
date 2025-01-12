@@ -4,6 +4,11 @@ DATE_WEEK = "week"
 DATE_24_HOURS = "24_hours"
 
 LINKEDIN = "linkedin"
+LEVER = "lever"
+
+GOOGLE = "google"
+BING = "bing"
+BRAVE = "brave"
 
 # constants used in application
 SECRETS_YAML = "secrets.yaml"
@@ -19,6 +24,11 @@ ERROR = "ERROR"
 CRITICAL = "CRITICAL"
 
 MINIMUM_LOG_LEVEL = "MINIMUM_LOG_LEVEL"
+
+WORK_PREFERENCES = "work_preferences"
+UPLOADS = "uploads"
+OUTPUT_FIELE_DIRECTORY = "outputFileDirectory"
+COLLECT_MODE = "collectMode"
 
 # Constants in llm_manager.py
 USAGE_METADATA = "usage_metadata"

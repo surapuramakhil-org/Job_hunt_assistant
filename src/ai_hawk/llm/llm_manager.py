@@ -1,3 +1,4 @@
+from typing import Tuple
 import json
 import os
 import re
@@ -6,7 +7,7 @@ import time
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 import httpx
 from dotenv import load_dotenv
@@ -16,10 +17,11 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompt_values import StringPromptValue
 from langchain_core.prompts import ChatPromptTemplate
 from Levenshtein import distance
+from loguru import logger
 
-import ai_hawk.llm.prompts as prompts
-from config import JOB_SUITABILITY_SCORE
-from constants import (
+import src.ai_hawk.llm.prompts as prompts
+from src.config import JOB_SUITABILITY_SCORE
+from src.constants import (
     AVAILABILITY,
     CERTIFICATIONS,
     CLAUDE,
@@ -71,8 +73,8 @@ from constants import (
     WORK_PREFERENCES,
 )
 from src.job import Job
-from src.logging import logger
-import config as cfg
+
+import src.config as cfg
 
 load_dotenv()
 
@@ -683,27 +685,54 @@ class GPTAnswerer:
         else:
             return "resume"
 
-    def is_job_suitable(self):
+    def is_job_suitable(self) -> Tuple[bool, Optional[int], Optional[str]]:
+        """
+        Determines if the job is suitable based on a score and reasoning extracted from LLM output.
+
+        Returns:
+            Tuple[bool, Optional[int], Optional[str]]: A tuple containing:
+                - A boolean indicating if the job is suitable.
+                - The suitability score (if available).
+                - The reasoning (if available).
+        """
         logger.info("Checking if job is suitable")
+        
+        # Create the prompt and process it through the chain
         prompt = ChatPromptTemplate.from_template(prompts.is_relavant_position_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
+        
+        # Invoke the chain with resume and job description
         raw_output = chain.invoke(
             {
                 RESUME: self.resume,
                 JOB_DESCRIPTION: self.job_description,
             }
         )
+        
+        # Clean and process LLM output
         output = self._clean_llm_output(raw_output)
         logger.debug(f"Job suitability output: {output}")
 
         try:
-            score = re.search(r"Score:\s*(\d+)", output, re.IGNORECASE).group(1)
-            reasoning = re.search(r"Reasoning:\s*(.+)", output, re.IGNORECASE | re.DOTALL).group(1)
+            # Extract score and reasoning using regex
+            score_match = re.search(r"Score:\s*(\d+)", output, re.IGNORECASE)
+            reasoning_match = re.search(r"Reasoning:\s*(.+)", output, re.IGNORECASE | re.DOTALL)
+            
+            score = int(score_match.group(1)) if score_match else None
+            reasoning = reasoning_match.group(1).strip() if reasoning_match else None
         except AttributeError:
-            logger.warning("Failed to extract score or reasoning from LLM. Proceeding with application, but job may or may not be suitable.")
-            return True
+            logger.warning(
+                "Failed to extract score or reasoning from LLM. "
+                "Proceeding with application, but job may or may not be suitable."
+            )
+            return True, None, None
 
         logger.info(f"Job suitability score: {score}")
-        if int(score) < JOB_SUITABILITY_SCORE:
+        
+        # Determine suitability based on the score
+        is_suitable = score is not None and score >= JOB_SUITABILITY_SCORE
+        
+        if not is_suitable:
             logger.debug(f"Job is not suitable: {reasoning}")
-        return int(score) >= JOB_SUITABILITY_SCORE
+        
+        return is_suitable, score, reasoning

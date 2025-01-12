@@ -7,11 +7,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from src.logging import logger
+from logger import logger
 
 class AIHawkAuthenticator(ABC):
 
     @property
+    @abstractmethod
     def home_url(self):
         pass
 
@@ -20,6 +21,7 @@ class AIHawkAuthenticator(ABC):
         pass
 
     @property
+    @abstractmethod
     def is_logged_in(self):
         pass
 

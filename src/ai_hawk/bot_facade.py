@@ -1,5 +1,5 @@
 from ai_hawk.job_manager import AIHawkJobManager
-from src.logging import logger
+from logger import logger
 
 
 class AIHawkBotState:

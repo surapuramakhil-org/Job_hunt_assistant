@@ -28,11 +28,18 @@ date:
 positions:
   - Software engineer
 
+# One or more keywords to look for in the job description, for example, "chromium browser". This field is optional.
+# Only use this field to find jobs that require specific technologies, products, or skills that is not mentioned in the job title.
+# Warning: Any jobs without matching keywords in the job description will be skipped.
+# this is AnyMatch, not all match
+keywords_whitelist: []
+
+# At the moment locations are country level.
+# write country code by looking at this list https://developers.google.com/custom-search/docs/json_api_reference#country-codes
 locations:
-  - Germany
+  - us
 
-apply_once_at_company: true
-
+# don't work are locations are country level.
 distance: 100
 
 company_blacklist:

@@ -145,7 +145,10 @@ venv.bak/
 *.iml
 
 # Visual Studio Code
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
 
 # Visual Studio 2015/2017/2019/2022
 .vs/
