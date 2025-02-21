@@ -30,18 +30,18 @@ class BaseJobsPage(WebPage):
         """
             This method will be called first, before get_jobs_from_page
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def job_tile_to_job(self, job_tile: T) -> Job: # type: ignore as it used to enforce between methods 
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def get_jobs_from_page(self, scroll=False) -> List[T]: # type: ignore as it used to enforce between methods 
         """
             This method will be called after next_job_page, even for the first time
         """
-        pass
+        raise NotImplementedError
 
 
 class BaseJobPage(WebPage):
@@ -51,140 +51,146 @@ class BaseJobPage(WebPage):
 
     @abstractmethod
     def goto_job_page(self, job: Job):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def get_apply_button(self, job_context: JobContext) -> WebElement:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def get_job_description(self, job: Job) -> str:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def get_recruiter_link(self) -> str:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def click_apply_button(self, job_context: JobContext) -> None:
-        pass
+        raise NotImplementedError
 
 
 class BaseApplicationPage(WebPage):
 
     def __init__(self, driver):
         super().__init__(driver)
+    
+    @abstractmethod
+    def wait_until_ready(self):
+        raise NotImplementedError
 
     @abstractmethod
     def has_next_button(self) -> bool:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def click_next_button(self) -> None:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def has_submit_button(self) -> bool:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def click_submit_button(self) -> None:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def has_errors(self) -> None:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def handle_errors(self) -> None:
         """this methos is also called as fix errors"""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def check_for_errors(self) -> None:
         """As the current impl needs this, later when we add retry mechanism, we will be moving to has errors and handle errors"""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def get_input_elements(self, form_section : WebElement) -> List[WebElement]:
         """this method will update to Enum / other easy way (in future) instead of webList"""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def is_upload_field(self, element: WebElement) -> bool:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def get_file_upload_elements(self) -> List[WebElement]:
         """ Deprecated """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def get_upload_element_heading(self, element: WebElement) -> str:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def upload_file(self, element: WebElement, file_path: str) -> None:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def get_form_sections(self) -> List[WebElement]:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def is_terms_of_service(self, element: WebElement) -> bool:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def accept_terms_of_service(self, element: WebElement) -> None:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def is_radio_question(self, element: WebElement) -> bool:
-        return False
+        raise NotImplementedError
 
     @abstractmethod
     def web_element_to_radio_question(self, element: WebElement) -> SelectQuestion:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def select_radio_option(
         self, radio_question_web_element: WebElement, answer: str
     ) -> None:
-        pass
+        """ Current aswer is sigle select, later we will add multi select, this method will be updated accordingly"""
+        raise NotImplementedError
 
     @abstractmethod
     def is_textbox_question(self, element: WebElement) -> bool:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def web_element_to_textbox_question(self, element: WebElement) -> TextBoxQuestion:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def fill_textbox_question(self, element: WebElement, answer: str) -> None:
-        pass
+        """ Make Sure you clear the text box before filling the answer """
+        raise NotImplementedError
 
     @abstractmethod
     def is_dropdown_question(self, element: WebElement) -> bool:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def web_element_to_dropdown_question(self, element: WebElement) -> SelectQuestion:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def select_dropdown_option(self, element: WebElement, answer: str) -> None:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def discard(self) -> None:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def save(self) -> None:
         """ this can be also be considered as save draft / save progress """
-        pass
+        raise NotImplementedError
 
 
 class BaseJobPortal(ABC):
@@ -195,22 +201,22 @@ class BaseJobPortal(ABC):
     @property
     @abstractmethod
     def jobs_page(self) -> BaseJobsPage:
-        pass
+        raise NotImplementedError
 
     @property
     @abstractmethod
     def job_page(self) -> BaseJobPage:
-        pass
+        raise NotImplementedError
 
     @property
     @abstractmethod
     def authenticator(self) -> AIHawkAuthenticator:
-        pass
+        raise NotImplementedError
 
     @property
     @abstractmethod
     def application_page(self) -> BaseApplicationPage:
-        pass
+        raise NotImplementedError
 
 
 def get_job_portal(portal_name, driver, work_preferences):

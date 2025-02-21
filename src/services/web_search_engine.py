@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 import config as config
 from config import ALLOWED_SEARCH_ENGINES, GOOGLE, BING, BRAVE
 from logger import logger
+from utils.string_utils import is_multi_word
 
 @dataclass
 class SearchResult:
@@ -182,12 +183,19 @@ class SearchQueryBuilder:
         # 2. Build whitelist portion as (whitelist1 OR whitelist2 OR ...)
         whitelist_part = ""
         if unified_query.whitelist:
-            whitelist_part = "(" + " OR ".join(unified_query.whitelist) + ")"
+            quoted = [
+            f"\"{w}\"" if is_multi_word(w) else w
+            for w in unified_query.whitelist
+            ]
+            whitelist_part = "(" + " OR ".join(quoted) + ")"
 
         # 3. Build blacklist portion as (-blacklist1 OR -blacklist2 OR ...)
         blacklist_part = ""
         if unified_query.blacklist:
-            negated = [f"-{b}" for b in unified_query.blacklist]
+            negated = [
+                f"-\"{b}\"" if is_multi_word(b) else f"-{b}"
+                for b in unified_query.blacklist
+            ]
             blacklist_part = "(" + " OR ".join(negated) + ")"
 
         # Combine them, skipping empty parts

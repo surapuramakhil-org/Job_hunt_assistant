@@ -230,13 +230,13 @@ Supporting job search assistant helps us continue to develop and improve this va
 
 </div>
 
-1. **Star the Repository**: If you find this project useful, please star the repository on GitHub. It helps increase the project's visibility and shows your appreciation.
+3. **Star the Repository**: If you find this project useful, please star the repository on GitHub. It helps increase the project's visibility and shows your appreciation.
 
-2. **Join the Community**: Join our [Discord](https://discord.gg/MYYwG8JyrQ) to connect with other users and contributors. Your participation helps build a supportive community around the project.
+4. **Join the Community**: Join our [Discord](https://discord.gg/MYYwG8JyrQ) to connect with other users and contributors. Your participation helps build a supportive community around the project.
 
-3. **Report Issues / Feature requests**: If you encounter any bugs or have suggestions for improvements, please open an issue on [GitHub](https://github.com/surapuramakhil-org/Job_hunt_assistant/issues). Your feedback is crucial for the project's growth.
+5. **Report Issues / Feature requests**: If you encounter any bugs or have suggestions for improvements, please open an issue on [GitHub](https://github.com/surapuramakhil-org/Job_hunt_assistant/issues). Your feedback is crucial for the project's growth.
 
-4. **Contribute Code**: If you're a developer, consider contributing code to the project. Check out our [Contribution Guidelines](docs/CONTRIBUTING.md), [PM docs](/docs/project_management.md)  for more information on how to get started.
+6. **Contribute Code**: If you're a developer, consider contributing code to the project. Check out our [Contribution Guidelines](docs/CONTRIBUTING.md), [PM docs](/docs/project_management.md)  for more information on how to get started.
 
 Your support is greatly appreciated and helps us make job search assistant a powerful tool for job seekers everywhere.
 

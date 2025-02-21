@@ -10,6 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import WebDriverException
+import undetected_chromedriver as uc
 from lib_resume_builder_AIHawk import (
     Resume,
     FacadeManager,
@@ -238,8 +239,7 @@ class FileManager:
 def init_browser() -> webdriver.Chrome:
     try:
         options = chrome_browser_options()
-        service = ChromeService(ChromeDriverManager().install())
-        return webdriver.Chrome(service=service, options=options)
+        return uc.Chrome(options=options)
     except Exception as e:
         raise RuntimeError(f"Failed to initialize browser: {str(e)}")
 

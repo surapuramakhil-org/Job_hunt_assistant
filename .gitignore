@@ -165,3 +165,4 @@ venv.bak/
 mono_crash.*
 
 job_applications/
+failed_job_applications/

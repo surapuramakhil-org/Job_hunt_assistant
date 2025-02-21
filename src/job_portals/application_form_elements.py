@@ -5,7 +5,7 @@ from attr import dataclass
 
 class TextBoxQuestionType(Enum):
     NUMERIC = "numeric"
-    TEXTBOX = "textbox"
+    TEXT = "text"
 
 class SelectQuestionType(Enum):
     SINGLE_SELECT = "single_select"

@@ -5,9 +5,19 @@
             "request": "launch",
             "name": "Launch Program",
             "program": "${workspaceFolder}/src/main.py",
-            "args": [],
+            "args": ["--resume", "akhil_resume_SE.pdf"],
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "type": "debugpy",
+            "request": "launch",
+            "name": "Run Unit Tests",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "purpose": ["debug-test"],
+            "env": {},
+            "args": ["-m", "pytest", "${workspaceFolder}/tests"]
         }
     ]
 }

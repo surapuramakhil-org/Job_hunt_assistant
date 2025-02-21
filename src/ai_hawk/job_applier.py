@@ -63,6 +63,7 @@ class AIHawkJobApplier:
             resume_dir = None
         self.job_page = job_portal.job_page
         self.job_application_page = job_portal.application_page
+        self.job_portal = job_portal
         self.resume_path = resume_dir
         self.set_old_answers = set_old_answers
         self.gpt_answerer = gpt_answerer
@@ -114,6 +115,9 @@ class AIHawkJobApplier:
             raise e
 
     def job_apply(self, job: Job):
+
+        self.job_page.goto_job_page(job)
+
         logger.debug(f"Starting job application for job: {job}")
         job_context = JobContext()
         job_context.job = job
@@ -238,6 +242,7 @@ class AIHawkJobApplier:
             logger.error(
                 f"Failed to fill up form sections: {e} {traceback.format_exc()}"
             )
+            raise e
 
     def _handle_upload_fields(
         self, element: WebElement, job_context: JobContext
@@ -260,7 +265,7 @@ class AIHawkJobApplier:
                 resume_file_path = os.path.abspath(self.resume_path)
                 self.job_application_page.upload_file(element, resume_file_path)
                 job_context.job.resume_path = resume_file_path
-                job_context.job_application.resume_path = str(resume_file_path)
+                job_context.job_application.resume_path = resume_file_path
                 logger.debug(f"Resume uploaded from path: {resume_file_path}")
             else:
                 logger.debug(
@@ -509,6 +514,8 @@ class AIHawkJobApplier:
         browser_utils.handle_security_checks()
         time_utils.tiny_sleep()
 
+        self.job_application_page.wait_until_ready()
+
         if self.job_application_page.is_upload_field(form_element):
             self._handle_upload_fields(form_element, job_context)
             return
@@ -536,6 +543,7 @@ class AIHawkJobApplier:
             logger.debug("Handled dropdown question")
             return
 
+    #TODO: Enhance this method to handle multi-select questions
     def _handle_radio_question(
         self,
         job_context: JobContext,

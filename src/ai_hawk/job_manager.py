@@ -334,8 +334,6 @@ class AIHawkJobManager:
                 self.write_to_file(job, "skipped", "Already applied to this company")
                 continue
             
-            
-            self.job_portal.job_page.goto_job_page(job)
                 
             try:
 
@@ -358,14 +356,9 @@ class AIHawkJobManager:
         logger.debug(f"Writing job application result to file: {file_name}")
         pdf_path = Path(job.resume_path).resolve()
         pdf_path = pdf_path.as_uri()
-        data = {
-            "company": job.company,
-            "job_title": job.title,
-            "link": job.link,
-            "job_recruiter": job.recruiter_link,
-            "job_location": job.location,
-            "pdf_path": pdf_path
-        }
+        data = job.__dict__
+        data["pdf_path"] = pdf_path
+        data["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if reason:
             data["reason"] = reason
